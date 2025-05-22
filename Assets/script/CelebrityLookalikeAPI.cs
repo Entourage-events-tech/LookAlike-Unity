@@ -38,8 +38,6 @@ namespace CelebrityLookalike
 
         public void FindLookalikes(Texture2D webcamTexture, int topK = 5)
         {
-
-
             // Convert to JPG (not PNG) which will ensure proper RGB format
             byte[] imageData = webcamTexture.EncodeToJPG(100);
 

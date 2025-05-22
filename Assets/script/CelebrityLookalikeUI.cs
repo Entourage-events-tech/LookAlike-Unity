@@ -92,6 +92,9 @@ public class CelebrityLookalikeUI : MonoBehaviour
 
             webCamTexture.Play();
 
+            capturedImage = new Texture2D((int)webCamTexture.width, (int)webCamTexture.height, TextureFormat.RGB24, false);
+
+
             _ = AdjustAspectRatio();
         }
         catch (Exception ex)
@@ -197,7 +200,7 @@ public class CelebrityLookalikeUI : MonoBehaviour
 
         Debug.Log($" {webCamTexture.width} - {webCamTexture.height} ");
 
-        capturedImage = new Texture2D((int)snapshot.width, (int)snapshot.height, TextureFormat.RGB24, false);
+        //capturedImage = new Texture2D((int)snapshot.width, (int)snapshot.height, TextureFormat.RGB24, false);
         // Display captured image
         capturedImageView.texture = snapshot;
 
