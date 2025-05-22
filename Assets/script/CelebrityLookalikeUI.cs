@@ -292,15 +292,15 @@ public class CelebrityLookalikeUI : MonoBehaviour
         nextButton.interactable = currentImageIndex < match.ImagePaths.Length - 1;
 
         // Load image
-        StartCoroutine( LoadImageCoroutine(match.ImagePaths[currentImageIndex]) );
+        _=LoadImageCoroutine(match.ImagePaths[currentImageIndex]);
     }
 
-    private IEnumerator LoadImageCoroutine(string path)
+    private async UniTask LoadImageCoroutine(string path)
     {
         // Read file
         try
         {
-            byte[] fileData = File.ReadAllBytes(path);
+            byte[] fileData = await File.ReadAllBytesAsync(path);
 
             // Create texture
             Texture2D texture = new Texture2D(2, 2);
@@ -322,7 +322,8 @@ public class CelebrityLookalikeUI : MonoBehaviour
             Debug.LogError($"Failed to load image from {path}: {ex.Message}");
             celebImageView.texture = null;
         }
-        yield return null;
+
+        await UniTask.Yield();
     }
 
     private void ShowPreviousResult()

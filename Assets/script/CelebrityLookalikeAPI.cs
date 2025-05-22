@@ -38,14 +38,6 @@ namespace CelebrityLookalike
 
         public void FindLookalikes(Texture2D webcamTexture, int topK = 5)
         {
-            //if (webcamTexture == null || !webcamTexture.isPlaying)
-            //{
-            //    OnError?.Invoke("Webcam not active");
-            //    return;
-            //}
-
-            // Create a texture to hold the webcam image
-            
 
 
             // Convert to JPG (not PNG) which will ensure proper RGB format
