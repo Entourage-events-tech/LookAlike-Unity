@@ -36,22 +36,20 @@ namespace CelebrityLookalike
         /// Find look-alikes using a webcam texture
         /// </summary>
 
-        public void FindLookalikes(WebCamTexture webcamTexture, int topK = 5)
+        public void FindLookalikes(Texture2D webcamTexture, int topK = 5)
         {
-            if (webcamTexture == null || !webcamTexture.isPlaying)
-            {
-                OnError?.Invoke("Webcam not active");
-                return;
-            }
+            //if (webcamTexture == null || !webcamTexture.isPlaying)
+            //{
+            //    OnError?.Invoke("Webcam not active");
+            //    return;
+            //}
 
             // Create a texture to hold the webcam image
-            Texture2D snapshot = new Texture2D(webcamTexture.width, webcamTexture.height, TextureFormat.RGB24, false);
-            snapshot.SetPixels(webcamTexture.GetPixels());
-            snapshot.Apply();
+            
 
 
             // Convert to JPG (not PNG) which will ensure proper RGB format
-            byte[] imageData = snapshot.EncodeToJPG(90);
+            byte[] imageData = webcamTexture.EncodeToJPG(100);
 
             FindLookalikes(imageData, "webcam.jpg", topK);
         }

@@ -71,6 +71,7 @@ public class CelebrityLookalikeUI : MonoBehaviour
                 return;
             }
 
+
             // Check if the configured camera exists
             bool cameraExists = devices.Any(d => d.name == cameraConfig.camera);
             if (!cameraExists)
@@ -137,58 +138,18 @@ public class CelebrityLookalikeUI : MonoBehaviour
             loadingPanel.SetActive(false);
     }
 
-    private void SetupCamera()
-    {
-        // Get available webcams
-        WebCamDevice[] devices = WebCamTexture.devices;
-
-        if (devices.Length == 0)
-        {
-            Debug.LogError("No webcam found");
-            return;
-        }
-
-        // Create webcam texture - use first camera by default
-        // Change index if needed (0 for first camera, 1 for second, etc.)
-        int cameraIndex = Mathf.Min(1, devices.Length - 1);
-
-        webCamTexture = new WebCamTexture(devices[1].name, 1280, 720, 30);
-
-        cameraView.texture = webCamTexture;
-
-        // Start camera
-        webCamTexture.Play();
-
-        // Update aspect ratio
-        _ = AdjustAspectRatio();
-    }
-    private float cameraRefreshRate = 0.05f; // 20fps update rate
-    private float lastCameraUpdate = 0;
-
-    void Update()
-    {
-        // Only update camera preview at specified rate
-        if (Time.time - lastCameraUpdate > cameraRefreshRate)
-        {
-            lastCameraUpdate = Time.time;
-            if (cameraView != null && webCamTexture != null && webCamTexture.isPlaying)
-            {
-                cameraView.texture = webCamTexture;
-            }
-        }
-    }
 
     private async UniTask AdjustAspectRatio()
-    {
-        
-        await UniTask.WaitForSeconds(0.2f);
-
+    { 
+    
         // Set aspect ratio
         float ratio = (float)webCamTexture.width / (float)webCamTexture.height;
         aspectRatioFitter.aspectRatio = ratio;
 
         // Adjust image rotation
         cameraView.rectTransform.localEulerAngles = new Vector3(0, 0, -webCamTexture.videoRotationAngle);
+        await UniTask.Yield();
+
     }
 
     private void SetupButtons()
@@ -225,25 +186,31 @@ public class CelebrityLookalikeUI : MonoBehaviour
         if (loadingPanel != null)
             loadingPanel.SetActive(true);
 
-        // Capture frame from webcam
-        capturedImage = new Texture2D(webCamTexture.width, webCamTexture.height);
-        capturedImage.SetPixels(webCamTexture.GetPixels());
-        capturedImage.Apply();
-
-        // Convert to proper orientation
-        if (webCamTexture.videoRotationAngle != 0)
-        {
-            capturedImage = RotateTexture(capturedImage, webCamTexture.videoRotationAngle);
-        }
-
-        // Display captured image
-        capturedImageView.texture = capturedImage;
 
         // Use a separate frame to start the API call
         yield return new WaitForEndOfFrame();
 
+
+        Texture2D snapshot = new Texture2D(webCamTexture.width, webCamTexture.height, TextureFormat.RGB24, false);
+        snapshot.SetPixels32(webCamTexture.GetPixels32());
+        snapshot.Apply();
+
+        Debug.Log($" {webCamTexture.width} - {webCamTexture.height} ");
+
+        capturedImage = new Texture2D((int)snapshot.width, (int)snapshot.height, TextureFormat.RGB24, false);
+        // Display captured image
+        capturedImageView.texture = snapshot;
+
+
+        AspectRatioFitter aspectFitter = capturedImageView.GetComponent<AspectRatioFitter>();
+        if (aspectFitter != null)
+        {
+            aspectFitter.aspectRatio = (float)capturedImageView.texture.width / capturedImage.height;
+        }
+
+
         // Call the API with the webcam texture
-        apiClient.FindLookalikes(webCamTexture, maxResults);
+        apiClient.FindLookalikes( snapshot , maxResults);
 
         // Note: The rest will be handled by the OnAPIResultsReceived callback
     }
@@ -357,13 +324,6 @@ public class CelebrityLookalikeUI : MonoBehaviour
         }
         yield return null;
     }
-
-    public void FitRawImageToTexture(RawImage rawImage, Texture2D texture)
-    {
-        
-    }
-
-
 
     private void ShowPreviousResult()
     {
