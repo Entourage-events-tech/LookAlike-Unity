@@ -18,9 +18,11 @@ public class CelebrityLookalikeUI : MonoBehaviour
     public AspectRatioFitter aspectRatioFitter;
     public Button captureButton;
 
+
     [Header("Results Panel")]
     public GameObject resultsPanel;
     public RawImage capturedImageView;
+    public RawImage confirmedImage;
 
     //public RawImage CelebritiesParent;
 
@@ -55,6 +57,13 @@ public class CelebrityLookalikeUI : MonoBehaviour
     private int currentResultIndex = 0;
     private int currentImageIndex = 0;
 
+
+
+    public void OnConfirmedCelebrity()
+    {
+        confirmedImage.texture = celebImageView.texture;
+        confirmedImage.GetComponent<AspectRatioFitter>().aspectRatio = celebImageView.GetComponent<AspectRatioFitter>().aspectRatio;
+    }
    
     public void InitializeCamera()
     {
